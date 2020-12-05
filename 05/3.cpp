@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
+#include <iterator>
 
 int main()
 {
@@ -33,10 +34,7 @@ int main()
 	}
 
 	std::sort(seats.begin(), seats.end());
-	for (auto it = seats.begin(), it2 = std::next(it) ; it2 != seats.end() ; ++it, ++it2) {
-		if (*it2 == *it + 2) {
-			std::cout << (*it + 1) << std::endl;
-			break;
-		}
-	}
+	auto it = std::adjacent_find(seats.begin(), seats.end(), [](int a, int b){ return b - a == 2; });
+	if (it != seats.end())
+		std::cout << (*it + 1) << std::endl;
 }

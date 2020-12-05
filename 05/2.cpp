@@ -16,13 +16,16 @@ int main()
 		if (s.empty())
 			continue;
 
-		unsigned int id = s[0] == 'B';
-		for (unsigned int y=1 ; y<7 ; y++) {
-			id = (id << 1) + (s[y] == 'B');
-		}
-		for (unsigned int x=0 ; x<3 ; x++) {
-			id = (id << 1) + (s[7+x] == 'R');
-		}
+		unsigned int id = ((s[0] == 'B') << 9) +
+				  ((s[1] == 'B') << 8) +
+				  ((s[2] == 'B') << 7) +
+				  ((s[3] == 'B') << 6) +
+				  ((s[4] == 'B') << 5) +
+				  ((s[5] == 'B') << 4) +
+				  ((s[6] == 'B') << 3) +
+				  ((s[7] == 'R') << 2) +
+				  ((s[8] == 'R') << 1) +
+				  ((s[9] == 'R') << 0);
 
 		if (id > max)
 			max = id;

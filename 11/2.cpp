@@ -1,14 +1,16 @@
 #include <iostream>
 #include <fstream>
 #include <array>
+#include <utility>
 #include <algorithm>
 #include <string_view>
 
 constexpr unsigned int COLUMNS = 91;
 constexpr unsigned int ROWS = 98;
 
-using Area = char[ROWS][COLUMNS];
+constexpr std::array<std::pair<int, int>, 8> DIRS{ {{-1,-1},{-1,0},{-1,1},{0,-1},{0,1},{1,-1},{1,0},{1,1}} };
 
+using Area = char[ROWS][COLUMNS];
 
 bool updateSeats(const Area& currentArea, Area& newArea)
 {
@@ -19,54 +21,17 @@ bool updateSeats(const Area& currentArea, Area& newArea)
 			if (currentArea[r][c] == '.')
 				continue;
 
-			int d = 1;
-			while (r-d >= 0 && c-d >= 0 && currentArea[r-d][c-d] == '.')
-				d++;
-			if (r-d >= 0 && c-d >= 0 && currentArea[r-d][c-d] == '#')
-				occupied++;
-
-			d = 1;
-			while (r-d >= 0 && currentArea[r-d][c] == '.')
-				d++;
-			if (r-d >= 0 && currentArea[r-d][c] == '#')
-				occupied++;
-
-			d = 1;
-			while (r-d >= 0 && c+d < COLUMNS && currentArea[r-d][c+d] == '.')
-				d++;
-			if (r-d >= 0 && c+d < COLUMNS && currentArea[r-d][c+d] == '#')
-				occupied++;
-
-			d = 1;
-			while (c-d >= 0 && currentArea[r][c-d] == '.')
-				d++;
-			if (c-d >= 0 && currentArea[r][c-d] == '#')
-				occupied++;
-
-			d = 1;
-			while (c+d < COLUMNS && currentArea[r][c+d] == '.')
-				d++;
-			if (c+d < COLUMNS && currentArea[r][c+d] == '#')
-				occupied++;
-
-			d = 1;
-			while (r+d < ROWS && c-d >= 0 && currentArea[r+d][c-d] == '.')
-				d++;
-			if (r+d < ROWS && c-d >= 0 && currentArea[r+d][c-d] == '#')
-				occupied++;
-
-			d = 1;
-			while (r+d < ROWS && currentArea[r+d][c] == '.')
-				d++;
-			if (r+d < ROWS && currentArea[r+d][c] == '#')
-				occupied++;
-
-			d = 1;
-			while (r+d < ROWS && c+d < COLUMNS && currentArea[r+d][c+d] == '.')
-				d++;
-			if (r+d < ROWS && c+d < COLUMNS && currentArea[r+d][c+d] == '#')
-				occupied++;
-
+			for (auto&& [dir_r, dir_c] : DIRS) {
+				int d = 1;
+				int dr;
+				int dc;
+				do {
+					dr = r + dir_r * d;
+					dc = c + dir_c * d;
+					d++;
+				} while (dr >= 0 && dr < ROWS && dc >= 0 && dc < COLUMNS && currentArea[dr][dc] == '.');
+				occupied += dr >= 0 && dr < ROWS && dc >= 0 && dc < COLUMNS && currentArea[dr][dc] == '#';
+			}
 
 			if (occupied == 0)
 				newArea[r][c] = '#';
@@ -117,5 +82,4 @@ int main()
 	} while (changed);
 
 	std::cout << std::count(areaIt, areaIt + ROWS * COLUMNS, '#') << std::endl;
-
 }

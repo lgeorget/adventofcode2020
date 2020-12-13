@@ -72,12 +72,12 @@ int main()
 
 		r0.divisor = r0.divisor * r1.divisor;
 		solution %= r0.divisor;
-		if (solution < 0)
-			solution += r0.divisor;
 		r0.modulo = solution;
 		//std::cout << "solution: " << solution << std::endl;
 	}
 
+	if (r0.modulo < 0)
+		r0.modulo += r0.divisor;
 	std::cout << static_cast<uint64_t>(r0.modulo) << std::endl;
 }
 

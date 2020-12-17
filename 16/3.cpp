@@ -59,7 +59,6 @@ long int deduce(Matching& possibilities, const Ticket& mine)
 				}
 			}
 			if (changed) {
-				std::cerr << "Resolved field " << it->back()->name << ": " << std::distance(possibilities.begin(), it) << std::endl;
 				if (it->back()->name.substr(0, 9) == "departure") {
 					total *= mine[std::distance(possibilities.begin(), it)];
 					found++;
@@ -111,17 +110,14 @@ int main()
 	std::getline(input, line); // "nearby tickets:"
 
 	while (std::getline(input, line)) {
-		std::cerr << "New ticket " << line << std::endl;
 		std::istringstream ticketStream{line};
 		std::string entry;
 
 		Ticket t;
 		while (std::getline(ticketStream, entry, ',')) {
 			unsigned int value = std::stoul(entry);
-			if (std::none_of(fields.begin(), fields.end(), std::bind(&Validity::operator(), std::placeholders::_1, value))) {
-				std::cerr << "Invalid ticket" << std::endl;
+			if (std::none_of(fields.begin(), fields.end(), [value](const Validity& v){ return v(value); }))
 				break;
-			}
 			t.push_back(value);
 		}
 		if (t.size() != possibilities.size()) // invalid ticket
@@ -129,36 +125,16 @@ int main()
 
 		for (unsigned int index=0 ; index<t.size() ; index++)
 		{
-			unsigned int value = t[index];
 			Matching::value_type& possibleFields = possibilities[index];
-			auto it = std::remove_if(possibleFields.begin(), possibleFields.end(),
-				[value](const Validity* v) {
-					if (!(*v)(value)) {
-						std::cerr << "Value " << value << " is not valid for field " << v->name << std::endl;
-						return true;
-					} else {
-						return false;
+			possibleFields.erase(
+				std::remove_if(possibleFields.begin(), possibleFields.end(),
+					[value{t[index]}](const Validity* v) {
+						return !(*v)(value);
 					}
-				}
+				),
+				possibleFields.end()
 			);
-			if (it != possibleFields.end()) {
-				std::cerr << "Removing " << std::distance(it, possibleFields.end()) << " field(s) at index " << index << std::endl;
-				possibleFields.erase(it, possibleFields.end());
-			}
 		}
-
-		std::cerr << "Remaining possibilities for each field: ";
-		std::cerr << "\n" << "| ";
-		for (unsigned int i=0 ; i<possibilities.size() ; i++) {
-			std::cerr.width(2);
-			std::cerr << i << " | ";
-		}
-		std::cerr << "\n" << "| ";
-		for (auto&& p : possibilities) {
-			std::cerr.width(2);
-			std::cerr << p.size() << " | ";
-		}
-		std::cerr << std::endl;
 	}
 
 	std::cout << deduce(possibilities, mine) << std::endl;

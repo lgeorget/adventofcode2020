@@ -1,10 +1,8 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
 #include <regex>
 #include <vector>
-#include <functional>
 #include <algorithm>
 
 struct Validity
@@ -57,16 +55,14 @@ int main()
 	}
 
 	unsigned int total = 0;
-	while (std::getline(input, line)) {
-		std::istringstream lineStream{line};
-		std::string entry;
-		while (std::getline(lineStream, entry, ',')) {
-			unsigned int value = std::stoul(entry);
-			if (std::none_of(fields.begin(), fields.end(), std::bind(&Validity::operator(), std::placeholders::_1, value))) {
-				std::cerr << "Invalid: " << value << std::endl;
-				total += value;
-			}
+	while (input) {
+		unsigned int value;
+		input >> value;
+		if (std::none_of(fields.begin(), fields.end(), [value](auto&& v){ return v(value); })) {
+			std::cerr << "Invalid: " << value << std::endl;
+			total += value;
 		}
+		input.get(); // eat either a comma or a newline
 	}
 
 	std::cout << total << std::endl;

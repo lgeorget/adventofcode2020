@@ -24,7 +24,7 @@ int score(const std::list<int>& deck)
 
 bool playGame(std::list<int>& deckPlayer1, std::list<int>& deckPlayer2)
 {
-	std::vector<std::string> alreadyPlayed;
+	std::vector<std::pair<std::list<int>, std::list<int>>> alreadyPlayed;
 
 	while (!deckPlayer1.empty() && !deckPlayer2.empty()) {
 /*		std::cerr << "Decks:\n";
@@ -34,11 +34,7 @@ bool playGame(std::list<int>& deckPlayer1, std::list<int>& deckPlayer2)
 		std::cerr << std::endl;
 */
 
-		std::string reminder;
-		for (int c : deckPlayer1)
-			reminder += std::to_string(c) + '-';
-		for (int c : deckPlayer2)
-			reminder += '-' + std::to_string(c);
+		auto reminder = std::make_pair(deckPlayer1, deckPlayer2);
 		if (std::find(alreadyPlayed.begin(), alreadyPlayed.end(), reminder) != alreadyPlayed.end())
 			return true; // Player 1 wins automatically
 		alreadyPlayed.emplace_back(reminder);
